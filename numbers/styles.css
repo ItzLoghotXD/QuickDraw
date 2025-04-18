@@ -1,0 +1,175 @@
+:root {
+    --bg-color: #121212;
+    --primary-color: #03A9F4;
+    --secondary-color: #212121;
+    --text-color: #EEEEEE;
+    --canvas-color: #000000;
+    --accent-color: #03DAC6;
+    --error-color: #CF6679;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+.canvas-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+canvas#drawingCanvas {
+    background-color: var(--canvas-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    cursor: crosshair;
+}
+
+.prediction-container {
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+}
+
+.prediction-box {
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#prediction-value {
+    font-size: 8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tools {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tool-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tool-btn.active {
+    background-color: var(--primary-color);
+    color: #000;
+}
+
+.tool-icon {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.size-slider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+input[type="range"] {
+    accent-color: var(--primary-color);
+}
+
+#clear-canvas {
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#clear-canvas:hover {
+    background-color: #e91e63;
+}
+
+.instructions {
+    text-align: center;
+    margin-top: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 768px) {
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .prediction-container {
+        min-width: auto;
+        width: 280px;
+    }
+    
+    .tools {
+        justify-content: center;
+    }
+    
+    .size-slider {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}

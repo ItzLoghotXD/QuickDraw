@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Draw! Numbers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quick Draw! Numbers</h1>
+            <p class="subtitle">Draw a digit from 0-9 and let the AI guess!</p>
+        </header>
+
+        <div class="canvas-container">
+            <canvas id="drawingCanvas" width="280" height="280"></canvas>
+            <div class="prediction-container">
+                <div class="prediction-box">
+                    <div id="prediction-value">?</div>
+                    <p>Prediction</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tools">
+            <div class="tool-btn active" id="brush">
+                <span class="tool-icon">✏️</span>
+                <span>Brush</span>
+            </div>
+            <div class="tool-btn" id="eraser">
+                <span class="tool-icon">🧽</span>
+                <span>Eraser</span>
+            </div>
+            <div class="size-slider">
+                <label for="brush-size">Size:</label>
+                <input type="range" id="brush-size" min="15" max="30" value="20">
+                <span id="size-value">20</span>
+            </div>
+            <button id="clear-canvas">Clear</button>
+        </div>
+
+        <div class="instructions">
+            <p>Draw a number from 0-9 on the canvas above.</p>
+            <p>The AI will try to guess what number you've drawn!</p>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/onnxjs/dist/onnx.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
