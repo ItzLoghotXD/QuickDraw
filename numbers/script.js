@@ -44,8 +44,7 @@ function draw(e) {
     ctx.stroke();
 
     [lastX, lastY] = [currentX, currentY];
-    
-    // Make prediction after short delay to avoid too frequent predictions
+
     clearTimeout(window.predictionTimeout);
     window.predictionTimeout = setTimeout(makePrediction, 300);
 }
@@ -58,10 +57,9 @@ function stopDrawing() {
 // Tool selection
 function selectTool(tool) {
     currentTool = tool;
-    
-    // Update UI
+
     [brushBtn, eraserBtn].forEach(btn => btn.classList.remove('active'));
-    
+
     if (tool === 'brush') {
         brushBtn.classList.add('active');
         ctx.strokeStyle = '#FFFFFF';
@@ -73,7 +71,8 @@ function selectTool(tool) {
 
 // Clear canvas
 function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     predictionValue.textContent = '?';
 }
 
@@ -96,111 +95,92 @@ async function initModel() {
         console.log('Model loaded successfully');
     } catch (e) {
         console.error('Failed to load ONNX model:', e);
-        console.error('Make sure your model.onnx file is in the same directory as your HTML file');
-        console.error('Also check if you need CORS enabled to load local files');
     }
 }
 
-// Preprocessing the canvas image for model input
+// Preprocess canvas to match model input
 function preprocessCanvas() {
-    // Resize the canvas to 28x28 for MNIST format
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = 28;
     tempCanvas.height = 28;
-    
-    // Draw the original canvas scaled down to 28x28 and in grayscale
+
+    // Scale drawing into 28x28 and black background
     tempCtx.fillStyle = 'black';
     tempCtx.fillRect(0, 0, 28, 28);
     tempCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 28, 28);
-    
-    // Get image data (RGBA)
+
     const imageData = tempCtx.getImageData(0, 0, 28, 28);
     const { data } = imageData;
-    
-    // Convert to grayscale and normalize (values between 0 and 1)
+
     const input = new Float32Array(28 * 28);
     for (let i = 0; i < 28 * 28; i++) {
-        // Only looking at the R channel (data[i*4]), as R=G=B in grayscale
+        // Normalize pixel: white stroke on black => foreground is high
         input[i] = data[i * 4] / 255.0;
     }
-    
+
     return input;
 }
 
-// Make prediction using the model
+// Run prediction
 async function makePrediction() {
     if (!modelReady) {
-        console.log('Model not ready yet');
+        console.log('Model not ready');
         return;
     }
-    
+
     try {
-        // Preprocess canvas data
         const input = preprocessCanvas();
-        
-        // Reshape to match model input dimensions [1, 1, 28, 28]
         const tensor = new onnx.Tensor(input, 'float32', [1, 1, 28, 28]);
-        
-        // Run inference
+
         const outputMap = await model.run([tensor]);
         const output = outputMap.values().next().value.data;
-        
-        // Find predicted class (digit)
+
         let maxProb = -Infinity;
         let predictedDigit = -1;
-        
-        // Apply softmax to get probabilities
+
         const expSum = output.reduce((sum, val) => sum + Math.exp(val), 0);
-        
         for (let i = 0; i < output.length; i++) {
             const probability = Math.exp(output[i]) / expSum;
-            
             if (probability > maxProb) {
                 maxProb = probability;
                 predictedDigit = i;
             }
         }
-        
-        // Update UI with prediction
+
         predictionValue.textContent = predictedDigit.toString();
-        
     } catch (e) {
         console.error('Prediction error:', e);
     }
 }
 
-// Event listeners
+// Mouse and touch event listeners
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mouseout', stopDrawing);
 
-// Touch events for mobile support
 canvas.addEventListener('touchstart', e => {
     e.preventDefault();
     const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousedown', {
+    canvas.dispatchEvent(new MouseEvent('mousedown', {
         clientX: touch.clientX,
         clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
+    }));
 });
 
 canvas.addEventListener('touchmove', e => {
     e.preventDefault();
     const touch = e.touches[0];
-    const mouseEvent = new MouseEvent('mousemove', {
+    canvas.dispatchEvent(new MouseEvent('mousemove', {
         clientX: touch.clientX,
         clientY: touch.clientY
-    });
-    canvas.dispatchEvent(mouseEvent);
+    }));
 });
 
 canvas.addEventListener('touchend', e => {
     e.preventDefault();
-    const mouseEvent = new MouseEvent('mouseup');
-    canvas.dispatchEvent(mouseEvent);
+    canvas.dispatchEvent(new MouseEvent('mouseup'));
 });
 
 // Tool selection
@@ -215,7 +195,7 @@ brushSizeSlider.addEventListener('input', () => {
 // Clear canvas
 clearBtn.addEventListener('click', clearCanvas);
 
-// Initialize
+// Init
 window.onload = () => {
     clearCanvas();
     initModel();
